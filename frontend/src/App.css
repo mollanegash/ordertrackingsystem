@@ -1,38 +1,106 @@
-.App {
+/* Global styles */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f7fa;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2 {
+  color: #333;
+}
+
+/* Wrapper around the app */
+.container {
+  padding: 2rem;
+}
+
+/* Header styles */
+h1 {
   text-align: center;
+  margin-bottom: 1rem;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Loader styles */
+.loader-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Orders list container */
+.orders-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  gap: 20px;
+  padding: 20px 0;
+}
+
+/* Order card styles */
+.order-card {
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.order-card p {
+  margin: 5px 0;
+}
+
+/* Form Styles */
+form {
+  text-align: center;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+form label {
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+form input {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin: 10px 0;
+}
+
+form button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4fa94d;
   color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
-.App-link {
-  color: #61dafb;
+form button:hover {
+  background-color: #3d8f38;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* No orders found */
+.no-orders {
+  text-align: center;
+  font-size: 18px;
+}
+
+/* Create New Order Section */
+.create-order-section {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.create-order-section h2 {
+  font-size: 24px;
+  color: #333;
 }
