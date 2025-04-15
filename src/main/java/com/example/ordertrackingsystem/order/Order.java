@@ -1,22 +1,25 @@
 package com.example.ordertrackingsystem.order;
 
-import com.example.ordertrackingsystem.model.Customer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "\"order\"")  // Escape the reserved word 'order' by using quotes
+@Table(name = "\"order\"")  // Escaping SQL reserved word
 public class Order {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // other fields...
+    private String status;
+    private LocalDate shippingDate;
+
+    // Other relationships (e.g., OrderItems, Customer) can be added here
 }
