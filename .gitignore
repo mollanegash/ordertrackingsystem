@@ -1,0 +1,21 @@
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Build output
+target/
+out/
+
+# Maven
+.mvn/
+!mvnw
+!mvnw.cmd
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

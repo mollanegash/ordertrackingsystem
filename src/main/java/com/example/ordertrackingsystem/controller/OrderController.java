@@ -31,6 +31,6 @@ public class OrderController {
     }
     @GetMapping("/api")
     public String getAllApisOrders() {
-        return "this is my api";
+        return "this is my api for omgts";
     }
 }
