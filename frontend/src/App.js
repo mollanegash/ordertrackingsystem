@@ -1,141 +1,181 @@
-import React, { useState, useEffect } from "react";
-import { InfinitySpin } from "react-loader-spinner";
-import './App.css';  // Import the CSS file
+import React, { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './App.css';  // Import the updated CSS
 
-function App() {
+function OrderForm() {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("");
-  const [shippingDate, setShippingDate] = useState("");
+  const [status, setStatus] = useState('');
+  const [shippingDate, setShippingDate] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState('id');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [editOrderId, setEditOrderId] = useState(null);
+  const itemsPerPage = 5;
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/orders")
-      .then((res) => res.json())
-      .then((data) => {
-        setOrders(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching orders:", error);
-        setLoading(false);
-      });
+    fetchAllOrders();
   }, []);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const newOrder = { status, shippingDate };
-
+  const fetchAllOrders = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newOrder),
-      });
-      const data = await response.json();
-      console.log("Order Created:", data);
-      setOrders([...orders, data]); // Add the newly created order to the list
-      setStatus("");
-      setShippingDate("");
-    } catch (error) {
-      console.error("Error creating order:", error);
+      const res = await fetch('http://localhost:8080/api/orders');
+      const data = await res.json();
+      setOrders(data);
+    } catch {
+      toast.error('Failed to fetch orders');
     }
   };
 
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) return fetchAllOrders();
+    try {
+      const res = await fetch(`http://localhost:8080/api/orders/search?status=${searchTerm}`);
+      const data = await res.json();
+      setOrders(data);
+    } catch {
+      toast.error('Search failed');
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!status || !shippingDate) return toast.warn('All fields are required');
+
+    const payload = { status, shippingDate };
+    const url = editOrderId ? `http://localhost:8080/api/orders/${editOrderId}` : 'http://localhost:8080/api/orders';
+    const method = editOrderId ? 'PUT' : 'POST';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error();
+      fetchAllOrders();
+      setStatus('');
+      setShippingDate('');
+      setEditOrderId(null);
+      toast.success(`Order ${editOrderId ? 'updated' : 'created'} successfully`);
+    } catch {
+      toast.error(`Failed to ${editOrderId ? 'update' : 'create'} order`);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/orders/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      setOrders(orders.filter(order => order.id !== id));
+      toast.success('Order deleted');
+    } catch {
+      toast.error('Failed to delete');
+    }
+  };
+
+  const handleEdit = (order) => {
+    setEditOrderId(order.id);
+    setStatus(order.status);
+    setShippingDate(order.shippingDate);
+    window.scrollTo(0, 0);
+  };
+
+  const handleSort = (field) => {
+    const direction = sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
+    setSortField(field);
+    setSortDirection(direction);
+    const sorted = [...orders].sort((a, b) => {
+      if (a[field] < b[field]) return direction === 'asc' ? -1 : 1;
+      if (a[field] > b[field]) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+    setOrders(sorted);
+  };
+
+  const paginatedOrders = orders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+
   return (
-    <div style={{ padding: "2rem", fontFamily: "Arial, sans-serif" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>
-        📦 Order Tracking System
-      </h1>
+    <div className="container">
+      <ToastContainer />
+      <h1>📦 Order Tracking System</h1>
 
-      {loading ? (
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <InfinitySpin width="200" color="#4fa94d" />
-        </div>
-      ) : orders.length === 0 ? (
-        <p style={{ textAlign: "center", fontSize: "18px" }}>No orders found.</p>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          {orders.map((order) => (
-            <div
-              key={order.id}
-              style={{
-                padding: "20px",
-                borderRadius: "8px",
-                border: "1px solid #ddd",
-                backgroundColor: "#f9f9f9",
-                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                fontSize: "18px",
-                fontWeight: "bold",
-              }}
-            >
-              <p>
-                <strong>Order ID:</strong> {order.id}
-              </p>
-              <p>
-                <strong>Status:</strong> {order.status}
-              </p>
-              <p>
-                <strong>Shipping Date:</strong> {order.shippingDate}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="search-section">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by status..."
+        />
+        <button onClick={handleSearch}>Search</button>
+      </div>
 
-      <h2 style={{ textAlign: "center", marginTop: "2rem" }}>Create New Order</h2>
-      <form onSubmit={handleSubmit} style={{ textAlign: "center" }}>
-        <label style={{ fontSize: "18px", marginRight: "10px" }}>
-          Status:
-          <input
-            type="text"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            style={{
-              padding: "10px",
-              fontSize: "16px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              margin: "10px 0",
-            }}
-          />
-        </label>
-        <br />
-        <label style={{ fontSize: "18px", marginRight: "10px" }}>
-          Shipping Date:
-          <input
-            type="date"
-            value={shippingDate}
-            onChange={(e) => setShippingDate(e.target.value)}
-            style={{
-              padding: "10px",
-              fontSize: "16px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              margin: "10px 0",
-            }}
-          />
-        </label>
-        <br />
-        <button
-          type="submit"
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            backgroundColor: "#4fa94d",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-            marginTop: "10px",
-          }}
-        >
-          Create Order
-        </button>
+      <h2>{editOrderId ? 'Edit Order' : 'Create Order'}</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        />
+        <input
+          type="date"
+          value={shippingDate}
+          onChange={(e) => setShippingDate(e.target.value)}
+        />
+        <button type="submit">{editOrderId ? 'Update' : 'Create'}</button>
       </form>
+
+      <div className="sort-section">
+        <label>Sort By:</label>
+        <select onChange={(e) => handleSort(e.target.value)} value={sortField}>
+          <option value="id">ID</option>
+          <option value="status">Status</option>
+          <option value="shippingDate">Shipping Date</option>
+        </select>
+        <button onClick={() => handleSort(sortField)}>{sortDirection === 'asc' ? 'Asc' : 'Desc'}</button>
+      </div>
+
+      <h2>Orders</h2>
+      <table>
+        <thead>
+          <tr>
+            <th onClick={() => handleSort('id')}>ID</th>
+            <th onClick={() => handleSort('status')}>Status</th>
+            <th onClick={() => handleSort('shippingDate')}>Shipping Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedOrders.map(order => (
+            <tr key={order.id}>
+              <td>{order.id}</td>
+              <td>{order.status}</td>
+              <td>{order.shippingDate}</td>
+              <td>
+                <button onClick={() => handleEdit(order)}>Edit</button>
+                <button onClick={() => handleDelete(order.id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="pagination">
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i + 1}
+            onClick={() => setCurrentPage(i + 1)}
+            disabled={currentPage === i + 1}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
 
-export default App;
+export default OrderForm;
