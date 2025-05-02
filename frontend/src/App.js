@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './App.css';  // Import the updated CSS
+import './App.css';  // Your custom CSS
+import { ToastContainer, toast } from 'react-toastify';
+
 
 function OrderForm() {
   const [orders, setOrders] = useState([]);
