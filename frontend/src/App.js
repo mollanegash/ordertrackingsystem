@@ -21,7 +21,7 @@ function OrderForm() {
 
   const fetchAllOrders = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/orders');
+     const res = await fetch('https://ordertrackingsystem.onrender.com/api/orders');
       const data = await res.json();
       setOrders(data);
     } catch {
@@ -32,7 +32,7 @@ function OrderForm() {
   const handleSearch = async () => {
     if (!searchTerm.trim()) return fetchAllOrders();
     try {
-      const res = await fetch(`http://localhost:8080/api/orders/search?status=${searchTerm}`);
+      const res = await fetch(`https://ordertrackingsystem.onrender.com/api/orders/search?status=${searchTerm}`);
       const data = await res.json();
       setOrders(data);
     } catch {
@@ -45,7 +45,9 @@ function OrderForm() {
     if (!status || !shippingDate) return toast.warn('All fields are required');
 
     const payload = { status, shippingDate };
-    const url = editOrderId ? `http://localhost:8080/api/orders/${editOrderId}` : 'http://localhost:8080/api/orders';
+const url = editOrderId
+  ? `https://ordertrackingsystem.onrender.com/api/orders/${editOrderId}`
+  : 'https://ordertrackingsystem.onrender.com/api/orders';
     const method = editOrderId ? 'PUT' : 'POST';
 
     try {
@@ -67,7 +69,10 @@ function OrderForm() {
 
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/orders/${id}`, { method: 'DELETE' });
+    const res = await fetch(
+  `https://ordertrackingsystem.onrender.com/api/orders/${id}`,
+  { method: 'DELETE' }
+);
       if (!res.ok) throw new Error();
       setOrders(orders.filter(order => order.id !== id));
       toast.success('Order deleted');
