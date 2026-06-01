@@ -82,12 +82,8 @@ PostgreSQL Database (Render Cloud Instance)
 
 ### Backend
 
-* Java 17
-* Spring Boot 3
-* Spring Data JPA
-* Hibernate
-* Maven
-* PostgreSQL Driver
+⚙️ Tech Stack
+Backend Java 22 Spring Boot 3.4.4 Spring Data JPA Hibernate Maven PostgreSQL Driver
 
 ### Frontend
 
